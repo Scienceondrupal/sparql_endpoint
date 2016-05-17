@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * sparql_endpoint.module
+ *
+ */
+
+use Drupal\sparql_endpoint\SparqlEndpoint;
+use Drupal\sparql_endpoint\SparqlEndpointConfig;
+use Drupal\sparql_endpoint\SparqlEndpointException;
+use Drupal\sparql_endpoint\SparqlEndpointRequestHandler;
+
+/**
+ * Query the public SPARQL endpoint for this OSPREY site and return the results as JSON
+ *
+ * @param object $endpoint
+ *   A SparqlEndpoint object
+ *
+ * @param string $query
+ *    A SPARQL query to run
+ *
+ * @param array $options
+ *    Request-specific options
+ *
+ * @return mixed
+ *   The results of the executed query
+ */
+function sparql_endpoint_query(SparqlEndpoint $endpoint, string $query, array $options = array()) {
+  return $endpoint->executeQuery($query, $options);
+}
