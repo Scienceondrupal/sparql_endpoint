@@ -2,15 +2,13 @@
 
 /**
  * @file
- * SparqlEndpointRequestHandler.class.php
+ * SparqlEndpointRequestHandler.php
  *
  */
 
-namespace Drupal\sparql_endpoint;
+namespace Drupal\sparql_endpoint\handlers;
 
-interface SparqlEndpointRequestHandlerInterface {
-  protected function handleRequest(string $url, string $method, array $headers, $request_data);
-}
+use Drupal\sparql_endpoint\SparqlEndpointConfig;
 
 /**
  * Uses drupal_http_request().
@@ -40,7 +38,7 @@ class SparqlEndpointRequestHandler implements SparqlEndpointRequestHandlerInterf
    *
    * @throws SparqlEndpointException if response code != 200
    */
-  protected function handleRequest(SparqlEndpointConfig $config, string $url, string $method, array $headers, $request_data) {
+  public static function handleRequest(SparqlEndpointConfig $config, $url, $method, array $headers, $request_data) {
     // Prepare request options
     $req_options = array(
       'method' => $method,
@@ -50,7 +48,6 @@ class SparqlEndpointRequestHandler implements SparqlEndpointRequestHandlerInterf
 
     // Execute a drupal_http_request().
     $response = drupal_http_request($url, $req_options);
-
     if (200 == $response->code) {
       return $response->data;
     }

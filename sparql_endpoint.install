@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * @file
+ * sparql_endpoint.install
+ *
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function sparql_endpoint_uninstall() {
+  cache_clear_all('sparql_endpoint_configurations', 'cache', TRUE);
+}

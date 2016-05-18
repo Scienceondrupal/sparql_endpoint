@@ -4,18 +4,92 @@
  * @file
  * sparql_endpoint.module
  *
+ * $endpoint = sparql_endpoint_get_endpoint('DBpedia-JSON');
+ * $query = 'select distinct ?class where {[] a ?class} LIMIT 5';
+ * $data = sparql_endpoint_query($endpoint, $query);
  */
 
-use Drupal\sparql_endpoint\SparqlEndpoint;
-use Drupal\sparql_endpoint\SparqlEndpointConfig;
-use Drupal\sparql_endpoint\SparqlEndpointException;
-use Drupal\sparql_endpoint\SparqlEndpointRequestHandler;
+/**
+ * Implements hook_flush_caches().
+ */
+function sparql_endpoint_flush_caches() {
+  // Update the SPARQL endpoint configurations.
+  sparql_endpoint_configurations();
+}
+
+function sparql_endpoint_configurations() {
+  $config = [
+    'DBpedia' => [
+      'class' => '\Drupal\sparql_endpoint\SparqlEndpoint',
+      'endpoint_url' => 'http://dbpedia.org/sparql',
+      'query_options' => [
+        'default-graph-uri' => 'http://dbpedia.org',
+      ],
+    ],
+    'DBpedia-JSON' => [
+      'class' => '\Drupal\sparql_endpoint\SparqlEndpoint',
+      'endpoint_url' => 'http://dbpedia.org/sparql',
+      'response_parser' => '\Drupal\sparql_endpoint\parsers\SparqlEndpointResponseSparqlJsonParser',
+      'options' => [
+        'query_string' => [
+          'default-graph-uri' => 'http://dbpedia.org',
+          'format' => 'application/sparql-results+json',
+          'timeout' => '30000',
+        ],
+      ],
+    ],
+  ];
+
+  // Allow other modules to define their own SPARQL Endpoints.
+  drupal_alter('sparql_endpoint_configurations', $config);
+
+  // Store the configurations.
+  $cache = cache_set('sparql_endpoint_configurations', $config, 'cache', CACHE_PERMANENT);
+
+  return $config;
+}
+
+/**
+ * Get a SparqlEndpoint.
+ *
+ * This function maintains static instances of the endpoints. To keep track of
+ * multiple endpoints, use the optional $name parameter.
+ *
+ * @param string $config_name
+ *   A unique name for this configuration
+ *
+ * @return mixed
+ *   Either a SparqlEndpoint or FALSE
+ */
+function sparql_endpoint_get_endpoint($config_name) {
+  $endpoints = &drupal_static(__FUNCTION__);
+  if (!isset($endpoints[$config_name])) {
+    // Get the SparqlEndpoint configurations to build the SparqlEndpoint.
+    $cache = cache_get('sparql_endpoint_configurations', 'cache');
+
+    // If not cached, get the config.
+    if (!$cache) {
+      $config = sparql_endpoint_configurations();
+    }
+    else {
+      $config = $cache->data;
+    }
+
+    // Load the requested SparqlEndpoint if it doesn't already exist.
+    if ($config[$config_name]) {
+      $class = isset($config[$config_name]['class']) ? $config[$config_name]['class'] : '\Drupal\sparql_endpoint\SparqlEndpoint';
+      $endpoints[$config_name] = $class::getInstance($config[$config_name]);
+    }
+  }
+
+  return isset($endpoints[$config_name]) ? $endpoints[$config_name] : FALSE;
+}
 
 /**
  * Query the public SPARQL endpoint for this OSPREY site and return the results as JSON
  *
- * @param object $endpoint
- *   A SparqlEndpoint object
+ * @param SparqlEndpoint $endpoint
+ *   A SparqlEndpoint
  *
  * @param string $query
  *    A SPARQL query to run
@@ -26,6 +100,6 @@ use Drupal\sparql_endpoint\SparqlEndpointRequestHandler;
  * @return mixed
  *   The results of the executed query
  */
-function sparql_endpoint_query(SparqlEndpoint $endpoint, string $query, array $options = array()) {
+function sparql_endpoint_query(\Drupal\sparql_endpoint\SparqlEndpoint $endpoint, $query, array $options = array()) {
   return $endpoint->executeQuery($query, $options);
 }

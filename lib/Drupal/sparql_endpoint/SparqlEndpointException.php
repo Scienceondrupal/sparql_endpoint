@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * SparqlEndpointException.class.php
+ * SparqlEndpointException.php
  */
 
 namespace Drupal\sparql_endpoint;
