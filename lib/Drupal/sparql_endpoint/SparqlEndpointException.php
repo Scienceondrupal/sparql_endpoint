@@ -91,7 +91,7 @@ class SparqlEndpointException {
   public function __construct($message, $code = 500, array $headers = array()) {
     parent::__construct($message, $code);
     $phrase = $this->status[$code];
-    $header  = sprintf('HTTP/1.1 %d %s', $code, $phrase);
+    $header = sprintf('HTTP/1.1 %d %s', $code, $phrase);
     $this->addHeader($header);
     $this->addHeaders($headers);
   }
@@ -149,6 +149,18 @@ class SparqlEndpointException {
   public function setMessage($msg) {
       $this->message = (string) $msg;
       return $this;
+  }
+
+  public function __toString($delimiter = "\n") {
+    $arr = [
+      $this->getMessage(),
+    ];
+
+    if (!empty($headers)) {
+      $arr += $headers;
+    }
+
+    return implode($delimiter, $arr);
   }
 
 }

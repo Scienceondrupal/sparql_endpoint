@@ -68,8 +68,8 @@ class SparqlEndpoint implements SparqlEndpointInterface {
   /**
    * Execute a SPARQL query.
    *
-   * @param string $query
-   *   The SPARQL query to run
+   * @param string $statement
+   *   The SPARQL statement to run
    *
    * @param array $options
    *   Options for altering the default request
@@ -78,13 +78,19 @@ class SparqlEndpoint implements SparqlEndpointInterface {
    *
    * @throws SparqlEndpointException from handleResponse()
    */
-  public function executeQuery($query, array $options = array()) {
+  public function executeStatement($statement, array $options = array()) {
 
     $url = $this->getConfiguration()->getEndpointUrl();
 
     // Allow the caller to override the handler & parser.
-    $request_handler = isset($options['request_handler']) ? $options['request_handler'] : $this->getConfiguration()->getRequestHandler();
-    $parser = isset($options['parser']) ? $options['parser'] : $this->getConfiguration()->getResponseParser();
+    $request_handler_class = isset($options['request_handler']) ? $options['request_handler'] : $this->getConfiguration()->getRequestHandler();
+    if (!class_exists($request_handler_class)) {
+      throw new \Exception("Request Handler class '$request_handler_class' does not exist");
+    }
+    $parser_class = isset($options['parser']) ? $options['parser'] : $this->getConfiguration()->getResponseParser();
+    if (!class_exists($parser_class)) {
+      throw new \Exception("Parser class '$parser_class' does not exist");
+    }
 
     $cfg_options = $this->getConfiguration()->getOptions();
     $options += $cfg_options;
@@ -103,8 +109,9 @@ class SparqlEndpoint implements SparqlEndpointInterface {
         $headers[$header] = $value;
       }
     }
+
     // Query String.
-    $data = 'query=' . urlencode($query);
+    $data = 'query=' . urlencode($statement);
     // Check for user-defined query string extras.
     if (!empty($options['query_string'])) {
       foreach ($options['query_string'] as $key => $value) {
@@ -113,30 +120,9 @@ class SparqlEndpoint implements SparqlEndpointInterface {
     }
 
     // Handle the request.
-    $response = $request_handler::handleRequest($this->getConfiguration(), $url, $method, $headers, $data);
+    $response = $request_handler_class::handleRequest($this->getConfiguration(), $url, $method, $headers, $data, $options);
 
     // Return the parsed response.
-    return $parser::parse($this->getConfiguration(), $response);
-  }
-
-  /**
-   * Implements loadData().
-   */
-  public function loadData($data, array $options = array()) {
-    throw new Exception('Not implemented');
-  }
-
-  /**
-   * Implements deleteData().
-   */
-  public function deleteData($data, array $options = array()) {
-    throw new Exception('Not implemented');
-  }
-
-  /**
-   * Implements clearGraph().
-   */
-  public function clearGraph($graph, array $options = array()) {
-    throw new Exception('Not implemented');
+    return $parser_class::parse($this->getConfiguration(), $response);
   }
 }

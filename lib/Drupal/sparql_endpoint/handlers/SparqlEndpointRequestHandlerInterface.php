@@ -11,6 +11,7 @@ namespace Drupal\sparql_endpoint\handlers;
 use Drupal\sparql_endpoint\SparqlEndpointConfig;
 
 interface SparqlEndpointRequestHandlerInterface {
+
   /**
    * Process an HTTP request with drupal_http_request()
    *
@@ -29,8 +30,16 @@ interface SparqlEndpointRequestHandlerInterface {
    * @param mixed $request_data
    *    Any data to include in the request
    *
+   * @param array $options
+   *    Options provided for overrides
+   *
    * @return mixed
    *   The response data
    */
-  public static function handleRequest(SparqlEndpointConfig $config, $url, $method, array $headers, $request_data);
+  public static function handleRequest(SparqlEndpointConfig $config, $url, $method, array $headers, $request_data, array $options);
+
+  /**
+   *
+   */
+  public static function authenticate($response, SparqlEndpointConfig $config, $url, $method, array $headers, $request_data, array $options);
 }

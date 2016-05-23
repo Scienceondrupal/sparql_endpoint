@@ -5,8 +5,8 @@
  * sparql_endpoint.module
  *
  * $endpoint = sparql_endpoint_get_endpoint('DBpedia-JSON');
- * $query = 'select distinct ?class where {[] a ?class} LIMIT 5';
- * $data = sparql_endpoint_query($endpoint, $query);
+ * $statement = 'select distinct ?class where {[] a ?class} LIMIT 5';
+ * $data = sparql_endpoint_execute_statement($endpoint, $statement);
  */
 
 /**
@@ -22,9 +22,6 @@ function sparql_endpoint_configurations() {
     'DBpedia' => [
       'class' => '\Drupal\sparql_endpoint\SparqlEndpoint',
       'endpoint_url' => 'http://dbpedia.org/sparql',
-      'query_options' => [
-        'default-graph-uri' => 'http://dbpedia.org',
-      ],
     ],
     'DBpedia-JSON' => [
       'class' => '\Drupal\sparql_endpoint\SparqlEndpoint',
@@ -91,15 +88,29 @@ function sparql_endpoint_get_endpoint($config_name) {
  * @param SparqlEndpoint $endpoint
  *   A SparqlEndpoint
  *
- * @param string $query
- *    A SPARQL query to run
+ * @param string $statement
+ *    A SPARQL statement to run
  *
  * @param array $options
  *    Request-specific options
  *
  * @return mixed
- *   The results of the executed query
+ *   The results of the executed statement
  */
-function sparql_endpoint_query(\Drupal\sparql_endpoint\SparqlEndpoint $endpoint, $query, array $options = array()) {
-  return $endpoint->executeQuery($query, $options);
+function sparql_endpoint_execute_statement(\Drupal\sparql_endpoint\SparqlEndpointInterface $endpoint, $statement, array $options = array()) {
+
+  drupal_alter('sparql_endpoint_pre_execute', $endpoint, $statement, $options);
+  $result = NULL;
+  try {
+    $result = $endpoint->executeStatement($statement, $options);
+  }
+  catch (\Exception $exc) {
+    dpm($exc);
+    module_invoke_all('sparql_endpoint_statement_exception', $exc, $endpoint, $statement, $options);
+  }
+
+  drupal_alter('sparql_endpoint_post_execute', $result, $endpoint, $statement, $options);
+
+  return $result;
 }
+
