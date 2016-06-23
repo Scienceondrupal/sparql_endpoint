@@ -105,7 +105,6 @@ function sparql_endpoint_execute_statement(\Drupal\sparql_endpoint\SparqlEndpoin
     $result = $endpoint->executeStatement($statement, $options);
   }
   catch (\Exception $exc) {
-    dpm($exc);
     module_invoke_all('sparql_endpoint_statement_exception', $exc, $endpoint, $statement, $options);
   }
 

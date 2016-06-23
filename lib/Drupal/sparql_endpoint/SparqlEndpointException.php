@@ -8,10 +8,10 @@
 
 namespace Drupal\sparql_endpoint;
 
-class SparqlEndpointException {
+class SparqlEndpointException extends \Exception {
 
-  protected array $headers = array();
-  protected string $message = '';
+  protected $headers = array();
+  protected $message = '';
 
   /**
    * List of HTTP status codes
@@ -131,15 +131,6 @@ class SparqlEndpointException {
   }
 
   /**
-   * Return the message.
-   *
-   * @return string
-   */
-  public function getMessage() {
-      return $this->message;
-  }
-
-  /**
    * Define a message.
    *
    * @param string $msg
@@ -151,7 +142,11 @@ class SparqlEndpointException {
       return $this;
   }
 
-  public function __toString($delimiter = "\n") {
+  public function __toString() {
+    return $this->asString();
+  }
+
+  public function asString($delimiter = "\n") {
     $arr = [
       $this->getMessage(),
     ];

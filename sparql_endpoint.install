@@ -7,7 +7,7 @@
  */
 
 /**
- * Implements hook_enable().
+ * Implements hook_uninstall().
  */
 function sparql_endpoint_uninstall() {
   cache_clear_all('sparql_endpoint_configurations', 'cache', TRUE);
