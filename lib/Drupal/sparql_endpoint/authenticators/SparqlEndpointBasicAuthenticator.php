@@ -11,7 +11,7 @@ namespace Drupal\sparql_endpoint\authenticators;
 use \Drupal\sparql_endpoint\SparqlEndpointConfig;
 use \Drupal\sparql_endpoint\SparqlEndpointException;
 
-class SparqlEndpointHTTPBasicAuthenticator implements SparqlEndpointAuthenticatorInterface {
+class SparqlEndpointBasicAuthenticator implements SparqlEndpointAuthenticatorInterface {
 
   /**
    * Authenticate a DIGEST Auth response.
@@ -30,12 +30,12 @@ class SparqlEndpointHTTPBasicAuthenticator implements SparqlEndpointAuthenticato
    */
   public static function authenticate(array $data) {
 
-    $uri = $data['uri'];
+    $uri = $data['uri']['path'];
 
     if (!empty($data['username']) && isset($data['password'])) {
       return base64_encode($data['username'] . ':' . $data['password']);
     }
 
-    throw new Exception("Could not find the necessary credentials to authenticate request to $uri");
+    throw new \Exception("Could not find the necessary credentials to authenticate request to $uri");
   }
 }

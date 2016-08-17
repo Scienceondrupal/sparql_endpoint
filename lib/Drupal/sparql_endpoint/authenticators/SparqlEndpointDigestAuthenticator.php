@@ -11,7 +11,7 @@ namespace Drupal\sparql_endpoint\authenticators;
 use \Drupal\sparql_endpoint\SparqlEndpointConfig;
 use \Drupal\sparql_endpoint\SparqlEndpointException;
 
-class SparqlEndpointHTTPDigestAuthenticator implements SparqlEndpointAuthenticatorInterface {
+class SparqlEndpointDigestAuthenticator implements SparqlEndpointAuthenticatorInterface {
 
   /**
    * Authenticate a DIGEST Auth response.
@@ -30,12 +30,11 @@ class SparqlEndpointHTTPDigestAuthenticator implements SparqlEndpointAuthenticat
    */
   public static function authenticate(array $data) {
 
-    $uri = $data['uri'];
+    $uri = !empty($data['uri']['path']) ? $data['uri']['path'] : FALSE;
     $digest_header = $data['www_auth_header'];
     $username = $data['username'];
     $password = $data['password'];
-
-    if (isset($uri) && !empty($digest) && !empty($username) && isset($password)) {
+    if (isset($uri) && !empty($digest_header) && !empty($username) && isset($password)) {
       // DIGEST Auth.
       $value = explode(' ', $digest_header, 2);
       $data = array();
@@ -56,10 +55,10 @@ class SparqlEndpointHTTPDigestAuthenticator implements SparqlEndpointAuthenticat
         $auth_header .= '", qop=' . $data['qop'] . ', nc=' . $ncvalue . ', cnonce="' . $cnonce . '"';
         return $auth_header;
       } else {
-        throw new Exception("Could not authenticate the quality of protection value $data['qop'] for $uri");
+        throw new \Exception("Could not authenticate the quality of protection value " . $data['qop'] . " for $uri");
       }
     }
 
-    throw new Exception("Could not find the necessary credentials to authenticate request to $uri");
+    throw new \Exception("Could not find the necessary credentials to authenticate request to $uri");
   }
 }

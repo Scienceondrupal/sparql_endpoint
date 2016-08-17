@@ -93,6 +93,13 @@ function sparql_endpoint_get_endpoint($config_name) {
  *
  * @param array $options
  *    Request-specific options
+ *     'request_handler' => string (override the configuration)
+ *     'parser' => string (override the configuration)
+ *     'method' => string (the type of HTTP Method; default: POST)
+ *     'headers' => array(header name => header value) additional request headers
+ *     'query_string' => array(param name => value) additional query string parameters
+ *     'num_of_retries' => int (default: 3)
+ *     'credentials' => array('username' => string, 'password' => string)
  *
  * @return mixed
  *   The results of the executed statement

@@ -69,7 +69,7 @@ function sparql_endpoint_pre_execute_alter(\Drupal\sparql_endpoint\SparqlEndpoin
  * @param array $options
  *    The array of statement options
  */
-function sparql_endpoint_statement_exception(Exception $e, \Drupal\sparql_endpoint\SparqlEndpointInterface &$endpoint, &$statement, array &$options) {
+function sparql_endpoint_statement_exception(Exception $e, \Drupal\sparql_endpoint\SparqlEndpointInterface $endpoint, $statement, $options) {
   if ($e instanceof \Drupal\sparql_endpoint\SparqlEndpointException) {
     watchdog('sparql_endpoint', $e->__toString(), array(), WATCHDOG_ERROR);
   }

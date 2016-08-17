@@ -90,10 +90,9 @@ class SparqlEndpointException extends \Exception {
    */
   public function __construct($message, $code = 500, array $headers = array()) {
     parent::__construct($message, $code);
-    $phrase = $this->status[$code];
+    $phrase = !empty($this->status[$code]) ? $this->status[$code] : t('Unknown Error Code: @code', array('@code' => $code));
     $header = sprintf('HTTP/1.1 %d %s', $code, $phrase);
-    $this->addHeader($header);
-    $this->addHeaders($headers);
+    $this->addHeader($header)->addHeaders($headers);
   }
 
   /**
@@ -102,7 +101,7 @@ class SparqlEndpointException extends \Exception {
    * @return array
    */
   public function getHeaders() {
-      return $this->headers;
+    return $this->headers;
   }
 
   /**
@@ -147,12 +146,12 @@ class SparqlEndpointException extends \Exception {
   }
 
   public function asString($delimiter = "\n") {
-    $arr = [
+    $arr = array(
       $this->getMessage(),
-    ];
+    );
 
-    if (!empty($headers)) {
-      $arr += $headers;
+    if (!empty($this->headers)) {
+      $arr = array_merge($arr, $this->headers);
     }
 
     return implode($delimiter, $arr);

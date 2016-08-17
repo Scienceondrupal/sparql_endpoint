@@ -32,7 +32,7 @@ class SparqlEndpointConfig {
     $this->endpoint_url = $config['endpoint_url'];
     $this->request_handler = isset($config['request_handler']) ? $config['request_handler'] : '\Drupal\sparql_endpoint\handlers\SparqlEndpointRequestHandler';
     $this->response_parser = isset($config['response_parser']) ? $config['response_parser'] : '\Drupal\sparql_endpoint\parsers\SparqlEndpointResponseParser';
-    $this->authenticator = isset($config['authenticator']) ? $config['authenticator'] : '\Drupal\sparql_endpoint\authenticator\SparqlEndpointHttpAuthenticator';
+    $this->authenticator = isset($config['authenticator']) ? $config['authenticator'] : '\Drupal\sparql_endpoint\authenticators\SparqlEndpointHttpAuthenticator';
     $this->options = isset($config['options']) ? $config['options'] : array();
   }
 

@@ -41,6 +41,7 @@ class SparqlEndpointRequestHandler implements SparqlEndpointRequestHandlerInterf
    *   The response data
    */
   public static function handleRequest(SparqlEndpointConfig $config, $url, $method, array $headers, $request_data, array $options) {
+
     // Prepare request options
     $req_options = array(
       'method' => $method,
@@ -56,12 +57,12 @@ class SparqlEndpointRequestHandler implements SparqlEndpointRequestHandlerInterf
 
       case 401:
         if (empty($headers['Authorization'])) {
-          return $self::authenticate($config, $response, $url, $method, $headers, $request_data, $options);
+          return SparqlEndpointRequestHandler::authenticate($response, $config, $url, $method, $headers, $request_data, $options);
         }
         throw new SparqlEndpointException("Authentication failed.",401, $headers);
 
       default:
-        $msg = (!empty($response->data)) ? $response->data : 'Unknown Error occurred';
+        $msg = (!empty($response->data)) ? $response->data : (!empty($response->error) ? $response->error : 'Unknown Error occurred');
         $headers = (!empty($response->headers)) ? $response->headers : array();
         throw new SparqlEndpointException($msg, $response->code, $headers);
     }
@@ -102,7 +103,7 @@ class SparqlEndpointRequestHandler implements SparqlEndpointRequestHandlerInterf
 
     $authenticator_class = $config->getAuthenticator();
     if (!class_exists($authenticator_class)) {
-      throw new Exception(t('Authenticator class "@class" does not exist', array('@class' => $authenticator_class)));
+      throw new \Exception(t('Authenticator class "@class" does not exist', array('@class' => $authenticator_class)));
     }
 
     try {
@@ -112,8 +113,8 @@ class SparqlEndpointRequestHandler implements SparqlEndpointRequestHandlerInterf
         'username' => isset($options['credentials']['username']) ? $options['credentials']['username'] : FALSE,
         'password' => isset($options['credentials']['password']) ? $options['credentials']['password'] : FALSE,
       );
-      $headers['Authenticate'] = $authenticator_class::authenticate($auth_info);
-      return $self::handleRequest($config, $url, $method, $headers, $request_data, $options);
+      $headers['Authorization'] = $authenticator_class::authenticate($auth_info);
+      return SparqlEndpointRequestHandler::handleRequest($config, $url, $method, $headers, $request_data, $options);
     }
     catch (\Exception $e) {
       throw new SparqlEndpointException($e->getMessage(), 401, $headers);

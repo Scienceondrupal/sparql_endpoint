@@ -37,15 +37,15 @@ class SparqlEndpointHttpAuthenticator implements SparqlEndpointAuthenticatorInte
     if (!empty($tokens[0])) {
       switch ($tokens[0]) {
         case 'basic':
-          return SparqlEndpointHTTPBasicAuthenticator::authenticate($data);
+          return SparqlEndpointBasicAuthenticator::authenticate($data);
 
         case 'digest':
-          return SparqlEndpointHTTPDigestAuthenticator::authenticate($data);
+          return SparqlEndpointDigestAuthenticator::authenticate($data);
       }
 
-      throw new \Exception("No handler defined for '$tokens[0]'");
+      throw new \Exception("No handler defined for " . $tokens[0]);
     }
 
-    throw new \Exception("Could not determine how to authenticate for $data['www_auth_header']");
+    throw new \Exception("Could not determine how to authenticate for " . $data['www_auth_header']);
   }
 }
