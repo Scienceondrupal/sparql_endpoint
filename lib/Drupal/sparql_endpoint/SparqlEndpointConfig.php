@@ -59,6 +59,7 @@ class SparqlEndpointConfig {
   public function __toString() {
     $newline = "\n";
     $indent = '  ';
+    $str = array();
     // Endpoint URL.
     $str[] = 'Endpoint URL: ' . $this->getEndpointUrl();
 
@@ -87,7 +88,7 @@ class SparqlEndpointConfig {
       $indent .= $indent_string;
     }
 
-    $print = [];
+    $print = array();
     foreach ($arr as $key => $value) {
       $val = is_array($value) ? $this->_printArrayForToString($value, $indent_string, $level+1) : strval($value);
       $print[] = $key . ': ' . $val;

@@ -46,10 +46,10 @@ function sparql_endpoint_pre_execute_alter(\Drupal\sparql_endpoint\SparqlEndpoin
   );
 
   // Provide authentication information to an Authenticator.
-  $options['credentials'] = [
+  $options['credentials'] = array(
     'username' => 'admin',
     'password' => 'some-credentials-for-admin-account',
-  ];
+  );
 }
 
 /**

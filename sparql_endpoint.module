@@ -18,24 +18,24 @@ function sparql_endpoint_flush_caches() {
 }
 
 function sparql_endpoint_configurations() {
-  $config = [
-    'DBpedia' => [
+  $config = array(
+    'DBpedia' => array(
       'class' => '\Drupal\sparql_endpoint\SparqlEndpoint',
       'endpoint_url' => 'http://dbpedia.org/sparql',
-    ],
-    'DBpedia-JSON' => [
+    ),
+    'DBpedia-JSON' => array(
       'class' => '\Drupal\sparql_endpoint\SparqlEndpoint',
       'endpoint_url' => 'http://dbpedia.org/sparql',
       'response_parser' => '\Drupal\sparql_endpoint\parsers\SparqlEndpointResponseSparqlJsonParser',
-      'options' => [
-        'query_string' => [
+      'options' => array(
+        'query_string' => array(
           'default-graph-uri' => 'http://dbpedia.org',
           'format' => 'application/sparql-results+json',
           'timeout' => '30000',
-        ],
-      ],
-    ],
-  ];
+        ),
+      ),
+    ),
+  );
 
   // Allow other modules to define their own SPARQL Endpoints.
   drupal_alter('sparql_endpoint_configurations', $config);

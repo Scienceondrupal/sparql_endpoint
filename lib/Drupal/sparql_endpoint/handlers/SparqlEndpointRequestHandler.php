@@ -106,12 +106,12 @@ class SparqlEndpointRequestHandler implements SparqlEndpointRequestHandlerInterf
     }
 
     try {
-      $auth_info = [
+      $auth_info = array(
         'uri' => parse_url($url),
         'www_auth_header' => $response->headers['www-authenticate'],
         'username' => isset($options['credentials']['username']) ? $options['credentials']['username'] : FALSE,
         'password' => isset($options['credentials']['password']) ? $options['credentials']['password'] : FALSE,
-      ];
+      );
       $headers['Authenticate'] = $authenticator_class::authenticate($auth_info);
       return $self::handleRequest($config, $url, $method, $headers, $request_data, $options);
     }
